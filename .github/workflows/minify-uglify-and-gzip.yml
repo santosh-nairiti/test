@@ -3,7 +3,7 @@ name: Minify, Uglify, and Gzip Files
 on:
   push:
     branches:
-      - main  # Adjust branch name as per your repository
+      - test  # Adjust branch name as per your repository
 
 jobs:
   build:
@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        ref: test  # Specify the branch name to checkout
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
@@ -39,18 +41,10 @@ jobs:
         find . -name "*.css" -exec gzip -k {} \;
         find . -name "*.js" -exec gzip -k {} \;
 
-    - name: Check if files are changed
-      id: check_changes
-      run: |
-        git diff --exit-code || echo "::set-output name=files_changed::true"
-
     - name: Commit and push changes
-      if: steps.check_changes.outputs.files_changed == 'true'
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git add .
         git commit -m 'Minified, uglified, and gzipped files'
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        git push https://github.com/username/repository.git HEAD:demo
