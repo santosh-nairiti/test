@@ -1,0 +1,40 @@
+name: Uglify and Minify
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.js'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install uglify-js -g
+
+    - name: Uglify and Minify JavaScript files
+      run: |
+        for file in $(find . -type f -name '*.js'); do
+          uglifyjs "$file" --compress --mangle --output "${file%.js}.min.js"
+        done
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add .
+        git commit -m 'Uglify and minify JavaScript files'
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
