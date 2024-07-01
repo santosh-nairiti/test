@@ -14,3 +14,4 @@ jobs:
         node-version: '20.14.0'
         cache: 'npm'
     - run: npm install
+    - run: npm test
